@@ -1,8 +1,8 @@
-const CACHE_NAME = 'vocab-master-v2'; // Increment version
+const CACHE_NAME = 'vocab-master-v3'; // Increment version
 const PRECACHE_URLS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // Install: Pre-cache critical files
@@ -35,7 +35,6 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   // Strategy for External Assets (CDN, Fonts, Scripts) -> Cache First, fall back to network
-  // This ensures esm.sh, tailwind, fonts work offline after first load.
   if (
     url.hostname.includes('esm.sh') ||
     url.hostname.includes('tailwindcss.com') ||
@@ -53,7 +52,6 @@ self.addEventListener('fetch', event => {
           return cachedResponse;
         }
         return fetch(event.request).then(response => {
-          // Check for valid response
           if (!response || response.status !== 200 || response.type !== 'cors' && response.type !== 'basic' && response.type !== 'opaque') {
             return response;
           }
@@ -63,7 +61,6 @@ self.addEventListener('fetch', event => {
           });
           return response;
         }).catch(() => {
-             // Offline fallback if needed, but usually cache miss means fail for external assets
              return new Response('// Offline', { status: 503 });
         });
       })
@@ -83,7 +80,7 @@ self.addEventListener('fetch', event => {
         }
         return networkResponse;
       }).catch(() => {
-          // Network failed, nothing to do
+          // Network failed
       });
 
       return cachedResponse || fetchPromise;
